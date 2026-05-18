@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Category Manager</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #F8F8F6;
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #E5E5E3;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: #E6F1FB; display: grid; place-items: center;
+    }
+    .nav-title { font-size: 15px; font-weight: 500; color: #111; letter-spacing: -0.2px; }
+
+    .logout-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #A32D2D;
+      background: #FCEBEB; border: 1px solid #F09595;
+      border-radius: 8px; padding: 6px 12px;
+      text-decoration: none; transition: all 0.2s ease;
+      font-weight: 450;
+    }
+    .logout-btn:hover { background: #F7C1C1; border-color: #D67A7A; }
+
+    /* ── Page container ── */
+    .container { padding: 28px 24px; max-width: 1280px; margin: 0 auto; }
+
+    .top-row {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-title { 
+      font-size: 18px; font-weight: 600; color: #1E2A3A; 
+      letter-spacing: -0.2px;
+    }
+
+    .add-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500; color: #0C447C;
+      background: #E6F1FB; border: 1px solid #B5D4F4;
+      border-radius: 8px; padding: 8px 14px;
+      text-decoration: none; transition: all 0.2s;
+    }
+    .add-btn:hover { background: #D0E4F5; border-color: #8FB9E3; transform: translateY(-1px); }
+
+    /* Flash message */
+    .flash-message {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideDown 0.3s ease;
+    }
+    .flash-success { background: #E6F7E6; border-left: 4px solid #2E7D32; color: #1B5E20; }
+    .flash-error { background: #FCEBEB; border-left: 4px solid #C62828; color: #B71C1C; }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Table card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #E5E5E3;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+
+    thead tr { background: #FCFCFA; border-bottom: 1px solid #E5E5E3; }
+    th {
+      padding: 14px 16px;
+      font-size: 12px; font-weight: 600; color: #5A6B7A;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    th:first-child { width: 70px; }
+    th:nth-child(2) { width: auto; }
+    th:last-child  { width: 280px; }
+
+    td {
+      padding: 14px 16px;
+      font-size: 14px; color: #1F2A3E;
+      border-bottom: 1px solid #F0F0EE;
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #FAFAF8; transition: 0.1s; }
+
+    .row-num { color: #8F9EAD; font-size: 13px; font-weight: 450; }
+
+    .empty-row td {
+      padding: 48px 16px; text-align: center;
+      color: #9AAEBF; font-size: 14px;
+      background: #FEFEFC;
+    }
+
+    /* ── Action buttons group (View, Edit, Delete) ── */
+    .action-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .action-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12px; font-weight: 500;
+      border-radius: 7px; padding: 5px 12px;
+      text-decoration: none; transition: all 0.2s;
+      cursor: pointer;
+      line-height: 1.4;
+      border: 1px solid;
+    }
+
+    .view-btn {
+      color: #2C6E9E;
+      background: #EFF6FC;
+      border-color: #C9E0F2;
+    }
+    .view-btn:hover {
+      background: #E2EEF9;
+      border-color: #A9C9E7;
+      transform: translateY(-1px);
+    }
+
+    .edit-btn {
+      color: #B45F1B;
+      background: #FEF5E7;
+      border-color: #F3DEB5;
+    }
+    .edit-btn:hover {
+      background: #FEEFDA;
+      border-color: #E9C48B;
+      transform: translateY(-1px);
+    }
+
+    .delete-btn {
+      color: #A32D2D;
+      background: #FCEBEB;
+      border-color: #F09595;
+    }
+    .delete-btn:hover {
+      background: #F7DDDD;
+      border-color: #DB7A7A;
+      transform: translateY(-1px);
+    }
+
+    /* Modal styles for View */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(3px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      max-width: 450px;
+      width: 90%;
+      border-radius: 20px;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.25);
+      overflow: hidden;
+      animation: modalPop 0.2s ease;
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-header {
+      padding: 18px 24px;
+      background: #F8F8F6;
+      border-bottom: 1px solid #E5E5E3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1E2A3A;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #8F9EAD;
+      line-height: 1;
+    }
+    .modal-body {
+      padding: 24px;
+    }
+    .detail-row {
+      margin-bottom: 16px;
+    }
+    .detail-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #5A6B7A;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .detail-value {
+      font-size: 16px;
+      color: #1F2A3E;
+      word-break: break-word;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #F0F0EE;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .modal-footer button {
+      background: #E6F1FB;
+      border: 1px solid #B5D4F4;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    @media (max-width: 650px) {
+      .container { padding: 20px 16px; }
+      th:last-child { width: auto; }
+      .action-group { flex-direction: column; align-items: flex-start; gap: 6px; }
+      .action-btn { width: fit-content; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <span class="nav-title">Admin dashboard</span>
+    </div>
+    <a href="/auth/logout" class="logout-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="#A32D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </a>
+  </nav>
+
+  <!-- Content -->
+  <div class="container">
+    <div class="top-row">
+      <span class="page-title">📂 Category list</span>
+      <a href="/admin/add-category" class="add-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add category
+      </a>
+    </div>
+
+    <!-- Flash messages -->
+    <% if (locals.success && success) { %>
+      <div class="flash-message flash-success" id="flashMsg">
+        <span>✅</span> <%= success %>
+      </div>
+    <% } %>
+    <% if (locals.error && error) { %>
+      <div class="flash-message flash-error" id="flashMsg">
+        <span>⚠️</span> <%= error %>
+      </div>
+    <% } %>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Category name</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (categories && categories.length > 0) { %>
+            <% categories.forEach((cat, index) => { %>
+              <tr id="row-<%= cat._id %>">
+                <td class="row-num"><%= index + 1 %></td>
+                <td><strong><%= cat.categoriesName %></strong></td>
+                <td>
+                  <div class="action-group">
+                    <!-- View button (opens modal) -->
+                    <a href="/admin/view-category/<%= cat._id %>" class="action-btn view-btn" >
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                        <circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      View
+                    </a>
+                    <!-- Edit button -->
+                    <a href="/admin/edit-category/<%= cat._id %>" class="action-btn edit-btn">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 3l4 4-7 7H10v-4l7-7z"/>
+                        <path d="M4 20h16"/>
+                      </svg>
+                      Edit
+                    </a>
+                    <!-- Delete button with confirm -->
+                    <a href="/admin/delete-category/<%= cat._id %>" class="action-btn delete-btn" 
+                       onclick="return confirm('⚠️ Delete this category? All related items may be affected.')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14H6L5 6"/>
+                        <path d="M10 11v6"/><path d="M14 11v6"/>
+                        <path d="M9 6V4h6v2"/>
+                      </svg>
+                      Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr class="empty-row">
+              <td colspan="3">✨ No categories found. Click "Add category" to create one. ✨</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+</body>
+</html>

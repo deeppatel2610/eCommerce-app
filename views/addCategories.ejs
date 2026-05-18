@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Add Category</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #F8F8F6;
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #E5E5E3;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: #E6F1FB; display: grid; place-items: center;
+    }
+    .nav-title { font-size: 15px; font-weight: 500; color: #111; letter-spacing: -0.2px; }
+
+    .logout-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #A32D2D;
+      background: #FCEBEB; border: 1px solid #F09595;
+      border-radius: 8px; padding: 6px 12px;
+      text-decoration: none; transition: all 0.2s ease;
+      font-weight: 450;
+    }
+    .logout-btn:hover { background: #F7C1C1; border-color: #D67A7A; }
+
+    /* ── Page container ── */
+    .container { padding: 28px 24px; max-width: 800px; margin: 0 auto; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #0C447C;
+      text-decoration: none; margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+    .back-link:hover { color: #185FA5; text-decoration: underline; }
+
+    .page-title { 
+      font-size: 24px; font-weight: 600; color: #1E2A3A; 
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+    .page-desc {
+      font-size: 14px;
+      color: #6B7A8A;
+      margin-bottom: 24px;
+    }
+
+    /* ── Form card ── */
+    .card {
+      background: #fff;
+      border: 1px solid #E5E5E3;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .form-container {
+      padding: 28px 32px;
+    }
+
+    /* Error message only - no success flash */
+    .error-flash {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FCEBEB;
+      border-left: 4px solid #C62828;
+      color: #B71C1C;
+    }
+
+    /* Form groups */
+    .form-group {
+      margin-bottom: 24px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #3A4C62;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .required-star {
+      color: #C62828;
+      margin-left: 4px;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      border: 1px solid #D1D5DB;
+      border-radius: 10px;
+      transition: all 0.2s;
+      background: #fff;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #185FA5;
+      box-shadow: 0 0 0 3px rgba(24, 95, 165, 0.1);
+    }
+    input.error-input, textarea.error-input, select.error-input {
+      border-color: #C62828;
+      background: #FFF5F5;
+    }
+    .error-message {
+      color: #C62828;
+      font-size: 12px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .help-text {
+      font-size: 12px;
+      color: #8F9EAD;
+      margin-top: 6px;
+    }
+
+    /* Form actions */
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #F0F0EE;
+    }
+    .btn-submit {
+      background: #185FA5;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-submit:hover {
+      background: #0C447C;
+      transform: translateY(-1px);
+    }
+    .btn-cancel {
+      background: #F1F2F0;
+      color: #3A4C62;
+      border: 1px solid #E5E5E3;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-cancel:hover {
+      background: #E5E5E3;
+    }
+
+    /* Info box */
+    .info-box {
+      background: #FAFBF8;
+      border: 1px solid #E5E5E3;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+    .info-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #5A6B7A;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .info-text {
+      font-size: 13px;
+      color: #4B5C6E;
+    }
+
+    @media (max-width: 640px) {
+      .container { padding: 20px 16px; }
+      .form-container { padding: 20px; }
+      .form-actions { flex-direction: column; }
+      .btn-submit, .btn-cancel { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="#185FA5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <span class="nav-title">Admin dashboard</span>
+    </div>
+    <a href="/auth/logout" class="logout-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="#A32D2D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </a>
+  </nav>
+
+  <!-- Content -->
+  <div class="container">
+    <a href="/admin/dashboard" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back to categories
+    </a>
+
+    <div class="page-title">➕ Add new category</div>
+    <div class="page-desc">Create a new product category for your store inventory.</div>
+
+    <!-- ONLY ERROR MESSAGES - NO SUCCESS MESSAGES -->
+    <% if (locals.error && error) { %>
+      <div class="error-flash">
+        <span>⚠️</span> <%= error %>
+      </div>
+    <% } %>
+
+    <div class="card">
+      <div class="form-container">
+        <form method="POST" action="/admin/add-category">
+          <!-- Category Name field -->
+          <div class="form-group">
+            <label>
+              Category name <span class="required-star">*</span>
+            </label>
+            <input type="text" 
+                   name="categoriesName" 
+                   value="<%= locals.formData && formData.categoriesName ? formData.categoriesName : '' %>"
+                   placeholder="e.g., Electronics, Clothing, Books..."
+                   class="<%= locals.fieldError && fieldError.categoriesName ? 'error-input' : '' %>"
+                   maxlength="100">
+            <% if (locals.fieldError && fieldError.categoriesName) { %>
+              <div class="error-message">
+                <span>⚠️</span> <%= fieldError.categoriesName %>
+              </div>
+            <% } %>
+            <div class="help-text">Use a unique, descriptive name (2-100 characters).</div>
+          </div>
+
+          <!-- Description field -->
+          <div class="form-group">
+            <label>Description (optional)</label>
+            <textarea name="description" 
+                      rows="3" 
+                      placeholder="Brief description of this category..."><%= locals.formData && formData.description ? formData.description : '' %></textarea>
+            <% if (locals.fieldError && fieldError.description) { %>
+              <div class="error-message">
+                <span>⚠️</span> <%= fieldError.description %>
+              </div>
+            <% } %>
+            <div class="help-text">Helpful for internal reference (max 500 chars).</div>
+          </div>
+
+          <!-- Status selection -->
+          <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+              <option value="active" <%= locals.formData && formData.status === 'active' ? 'selected' : '' %>>✅ Active - Visible to customers</option>
+              <option value="inactive" <%= locals.formData && formData.status === 'inactive' ? 'selected' : '' %>>⛔ Inactive - Hidden from store</option>
+            </select>
+            <% if (locals.fieldError && fieldError.status) { %>
+              <div class="error-message">
+                <span>⚠️</span> <%= fieldError.status %>
+              </div>
+            <% } %>
+            <div class="help-text">Inactive categories won't appear on the frontend.</div>
+          </div>
+
+          <!-- Info box -->
+          <div class="info-box">
+            <div class="info-title">📌 Category guidelines</div>
+            <div class="info-text">
+              • Category names should be clear And unique.<br>
+              • Avoid special characters except hyphen or space.<br>
+              • Once created, categories can be edited or deactivated.
+            </div>
+          </div>
+
+          <!-- Form Buttons -->
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+              Create category
+            </button>
+            <a href="/admin/dashboard" class="btn-cancel">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+              Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

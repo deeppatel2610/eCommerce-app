@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Add Product</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: #F8F8F6;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #E5E5E3;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: #E6F1FB; display: grid; place-items: center;
+    }
+    .nav-title { font-size: 15px; font-weight: 500; color: #111; }
+    .logout-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #A32D2D;
+      background: #FCEBEB; border: 1px solid #F09595;
+      border-radius: 8px; padding: 6px 12px;
+      text-decoration: none;
+    }
+    .logout-btn:hover { background: #F7C1C1; }
+
+    .container { padding: 28px 24px; max-width: 900px; margin: 0 auto; }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #0C447C;
+      text-decoration: none; margin-bottom: 20px;
+    }
+    .back-link:hover { text-decoration: underline; }
+
+    .page-title { font-size: 24px; font-weight: 600; color: #1E2A3A; margin-bottom: 8px; }
+    .page-desc { font-size: 14px; color: #6B7A8A; margin-bottom: 24px; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #E5E5E3;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .form-container { padding: 28px 32px; }
+
+    .error-flash {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      background: #FCEBEB;
+      border-left: 4px solid #C62828;
+      color: #B71C1C;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-group { margin-bottom: 24px; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #3A4C62;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .required-star { color: #C62828; margin-left: 4px; }
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 15px;
+      font-family: inherit;
+      border: 1px solid #D1D5DB;
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: #185FA5;
+      box-shadow: 0 0 0 3px rgba(24,95,165,0.1);
+    }
+    input.error-input, select.error-input { border-color: #C62828; background: #FFF5F5; }
+    .error-message {
+      color: #C62828;
+      font-size: 12px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .help-text { font-size: 12px; color: #8F9EAD; margin-top: 6px; }
+
+    /* Category display box (non-editable) */
+    .category-display {
+      background: #F8F8F6;
+      border: 1px solid #E5E5E3;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 15px;
+      color: #1F2A3E;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .category-badge {
+      background: #E6F1FB;
+      color: #185FA5;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .info-icon {
+      color: #8F9EAD;
+      font-size: 12px;
+    }
+
+    /* Image upload styling (no JS) */
+    .image-upload-box {
+      border: 2px dashed #D1D5DB;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      background: #FAFAF8;
+      margin-bottom: 16px;
+    }
+    .image-upload-box p {
+      color: #6B7A8A;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+    .image-upload-box .file-input-label {
+      display: inline-block;
+      background: #185FA5;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 8px;
+    }
+    .image-upload-box .file-input-label:hover {
+      background: #0C447C;
+    }
+    input[type="file"] {
+      display: none;
+    }
+    .current-image {
+      margin-top: 16px;
+      padding: 12px;
+      background: #F0F4F9;
+      border-radius: 10px;
+      display: none;
+    }
+    .image-url-field {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #E5E5E3;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #F0F0EE;
+    }
+    .btn-submit {
+      background: #185FA5;
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-submit:hover { background: #0C447C; transform: translateY(-1px); }
+    .btn-cancel {
+      background: #F1F2F0;
+      color: #3A4C62;
+      border: 1px solid #E5E5E3;
+      padding: 10px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-cancel:hover { background: #E5E5E3; }
+
+    @media (max-width: 640px) {
+      .form-container { padding: 20px; }
+      .form-actions { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <span class="nav-title">Admin dashboard</span>
+    </div>
+    <a href="/auth/logout" class="logout-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A32D2D" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+      </svg>
+      Logout
+    </a>
+  </nav>
+
+  <div class="container">
+    <a href="/admin/view-category/<%= categoryId %>" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back to products
+    </a>
+
+    <div class="page-title">➕ Add New Product</div>
+    <div class="page-desc">Create a new product with details, image, and category (category is pre-selected and read-only).</div>
+
+    <% if (locals.error && error) { %>
+      <div class="error-flash"><span>⚠️</span> <%= error %></div>
+    <% } %>
+
+    <div class="card">
+      <div class="form-container">
+        <form method="POST" action="/admin/add-product/<%= categoryId %>" enctype="multipart/form-data">
+          
+          <!-- Product Name -->
+          <div class="form-group">
+            <label>Product Name <span class="required-star">*</span></label>
+            <input type="text" name="productName" value="<%= formData && formData.productName ? formData.productName : '' %>"
+                   class="<%= fieldError && fieldError.productName ? 'error-input' : '' %>" required>
+            <% if (fieldError && fieldError.productName) { %>
+              <div class="error-message">⚠️ <%= fieldError.productName %></div>
+            <% } %>
+            <div class="help-text">Enter the full product name (e.g., iPhone 15 Pro, Nike Air Max)</div>
+          </div>
+
+          <!-- Product Quantity -->
+          <div class="form-group">
+            <label>Product Quantity <span class="required-star">*</span></label>
+            <input type="number" name="productQuantity" value="<%= formData && formData.productQuantity ? formData.productQuantity : '0' %>"
+                   min="0" max="500" step="1"
+                   class="<%= fieldError && fieldError.productQuantity ? 'error-input' : '' %>" required>
+            <% if (fieldError && fieldError.productQuantity) { %>
+              <div class="error-message">⚠️ <%= fieldError.productQuantity %></div>
+            <% } %>
+            <div class="help-text">Maximum 500 units. Set to 0 for out of stock.</div>
+          </div>
+
+          <!-- Product Quality / Rating -->
+          <div class="form-group">
+            <label>Product Quality / Rating <span class="required-star">*</span></label>
+            <input type="number" name="productQuality" value="<%= formData && formData.productQuality ? formData.productQuality : '0' %>"
+                   min="0" max="5" step="0.1"
+                   class="<%= fieldError && fieldError.productQuality ? 'error-input' : '' %>" required>
+            <% if (fieldError && fieldError.productQuality) { %>
+              <div class="error-message">⚠️ <%= fieldError.productQuality %></div>
+            <% } %>
+            <div class="help-text">Product quality rating from 0.0 to 5.0</div>
+          </div>
+
+          <!-- Product Image Upload (No JavaScript) -->
+          <div class="form-group">
+            <label>Product Image</label>
+            <div class="image-upload-box">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="1.5">
+                <rect x="2" y="2" width="20" height="20" rx="2.18"/>
+                <circle cx="8.5" cy="8.5" r="2.5"/>
+                <path d="M21 15l-5-4-3 3-4-4-5 5"/>
+              </svg>
+              <p>Upload product image from your computer</p>
+              <label class="file-input-label">
+                Choose File
+                <input type="file" name="productImage" accept="image/*">
+              </label>
+              <p style="font-size: 11px; margin-top: 8px;">PNG, JPG, JPEG up to 5MB</p>
+            </div>
+            
+          <!-- Product Details / Description -->
+          <div class="form-group">
+            <label>Product Details / Description</label>
+            <textarea name="productDetails" rows="5" 
+                      placeholder="Enter detailed product information, features, specifications..."><%= formData && formData.productDetails ? formData.productDetails : '' %></textarea>
+            <% if (fieldError && fieldError.productDetails) { %>
+              <div class="error-message">⚠️ <%= fieldError.productDetails %></div>
+            <% } %>
+            <div class="help-text">Provide comprehensive product details for customers (max 2000 characters).</div>
+          </div>
+
+          <!-- Product Price -->
+          <div class="form-group">
+            <label>Product Price (USD)</label>
+            <input type="number" name="productPrice" value="<%= formData && formData.productPrice ? formData.productPrice : '' %>"
+                   min="0" step="0.01" placeholder="0.00">
+            <% if (fieldError && fieldError.productPrice) { %>
+              <div class="error-message">⚠️ <%= fieldError.productPrice %></div>
+            <% } %>
+            <div class="help-text">Optional: Set product price for storefront.</div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-submit">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+              Create Product
+            </button>
+            <a href="/admin/view-category/<%= categoryId %>" class="btn-cancel">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

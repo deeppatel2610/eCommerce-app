@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | View Product</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #F8F8F6;
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #E5E5E3;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: #E6F1FB; display: grid; place-items: center;
+    }
+    .nav-title { font-size: 15px; font-weight: 500; color: #111; }
+
+    .logout-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #A32D2D;
+      background: #FCEBEB; border: 1px solid #F09595;
+      border-radius: 8px; padding: 6px 12px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: #F7C1C1; }
+
+    /* ── Page container ── */
+    .container { padding: 28px 24px; max-width: 1200px; margin: 0 auto; }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #0C447C;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .back-link:hover { color: #185FA5; text-decoration: underline; }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+    }
+    .edit-btn, .delete-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500;
+      border-radius: 8px; padding: 8px 16px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .edit-btn {
+      color: #B45F1B;
+      background: #FEF5E7;
+      border: 1px solid #F3DEB5;
+    }
+    .edit-btn:hover { background: #FEEFDA; transform: translateY(-1px); }
+    .delete-btn {
+      color: #A32D2D;
+      background: #FCEBEB;
+      border: 1px solid #F09595;
+    }
+    .delete-btn:hover { background: #F7DDDD; transform: translateY(-1px); }
+
+    .page-title { 
+      font-size: 24px; font-weight: 600; color: #1E2A3A; 
+      margin-bottom: 8px;
+    }
+
+    /* ── Product Card ── */
+    .product-card {
+      background: #fff;
+      border: 1px solid #E5E5E3;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 28px;
+    }
+
+    .card-header {
+      background: #FCFCFA;
+      padding: 20px 28px;
+      border-bottom: 1px solid #E5E5E3;
+    }
+    .card-header h2 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1E2A3A;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-body {
+      padding: 28px;
+    }
+
+    /* Product Image Section */
+    .product-image-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #F0F0EE;
+    }
+    .product-image-container {
+      text-align: center;
+    }
+    .product-image {
+      max-width: 300px;
+      max-height: 300px;
+      width: auto;
+      height: auto;
+      border-radius: 16px;
+      border: 2px solid #E5E5E3;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      object-fit: cover;
+      background: #F8F8F6;
+    }
+    .no-image {
+      width: 300px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #F8F8F6;
+      border: 2px dashed #D1D5DB;
+      border-radius: 16px;
+      color: #9AAEBF;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .image-label {
+      font-size: 12px;
+      color: #6B7A8A;
+      margin-top: 8px;
+    }
+
+    /* Info grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .info-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8F9EAD;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .info-value {
+      font-size: 16px;
+      font-weight: 500;
+      color: #1F2A3E;
+      word-break: break-word;
+    }
+    .info-value-large {
+      font-size: 20px;
+      font-weight: 600;
+      color: #185FA5;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-active { background: #E6F7E6; color: #2E7D32; }
+    .badge-inactive { background: #FCEBEB; color: #C62828; }
+    .badge-draft { background: #FFF3E0; color: #E65100; }
+    .badge-low { background: #FFF3E0; color: #E65100; }
+    .badge-out { background: #FCEBEB; color: #C62828; }
+    .badge-category { background: #E6F1FB; color: #185FA5; }
+
+    /* Rating stars */
+    .stars {
+      color: #FFB300;
+      letter-spacing: 2px;
+      font-size: 18px;
+    }
+    .rating-number {
+      font-size: 14px;
+      color: #6B7A8A;
+      margin-left: 8px;
+    }
+
+    /* Description section */
+    .description-section {
+      background: #F8F8F6;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 28px;
+    }
+    .description-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #3A4C62;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .description-text {
+      font-size: 14px;
+      color: #2C3E50;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    /* Reviews section */
+    .reviews-section {
+      margin-top: 20px;
+    }
+    .reviews-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #F0F0EE;
+    }
+    .reviews-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1E2A3A;
+    }
+    .review-count {
+      background: #E6F1FB;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      color: #185FA5;
+    }
+    .review-card {
+      background: #FAFAF8;
+      border: 1px solid #F0F0EE;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+    .review-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .review-user {
+      font-weight: 600;
+      color: #1E2A3A;
+      font-size: 14px;
+    }
+    .review-date {
+      font-size: 11px;
+      color: #8F9EAD;
+    }
+    .review-stars {
+      margin-bottom: 8px;
+    }
+    .review-stars .stars {
+      font-size: 13px;
+    }
+    .review-comment {
+      font-size: 13px;
+      color: #4B5C6E;
+      line-height: 1.5;
+    }
+    .no-reviews {
+      text-align: center;
+      padding: 40px;
+      color: #9AAEBF;
+      background: #FAFAF8;
+      border-radius: 12px;
+    }
+
+    /* Meta info */
+    .meta-info {
+      display: flex;
+      gap: 16px;
+      padding-top: 20px;
+      border-top: 1px solid #F0F0EE;
+      font-size: 12px;
+      color: #8F9EAD;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 20px 16px; }
+      .info-grid { grid-template-columns: 1fr; gap: 16px; }
+      .card-header, .card-body { padding: 16px; }
+      .top-actions { flex-direction: column; align-items: flex-start; }
+      .product-image { max-width: 250px; max-height: 250px; }
+      .no-image { width: 250px; height: 250px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <span class="nav-title">Admin dashboard</span>
+    </div>
+    <a href="/auth/logout" class="logout-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A32D2D" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </a>
+  </nav>
+
+  <!-- Content -->
+  <div class="container">
+    <div class="top-actions">
+      <a href="/admin/view-category/<%= product.category %>" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Back to products
+      </a>
+      <div class="action-buttons">
+        <a href="/admin/edit-product/<%= product._id %>" class="edit-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 3l4 4-7 7H10v-4l7-7z"/>
+            <path d="M4 20h16"/>
+          </svg>
+          Edit Product
+        </a>
+        <a href="/admin/delete-product/<%= product._id %>" class="delete-btn" 
+           onclick="return confirm('Delete this product permanently?')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6"/><path d="M14 11v6"/>
+          </svg>
+          Delete Product
+        </a>
+      </div>
+    </div>
+
+    <div class="page-title">📦 <%= product.productName %></div>
+
+    <!-- Product Details Card -->
+    <div class="product-card">
+      <div class="card-header">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2"/>
+            <line x1="3" y1="9" x2="21" y2="9"/>
+            <line x1="9" y1="21" x2="9" y2="9"/>
+          </svg>
+          Product Information
+        </h2>
+      </div>
+      <div class="card-body">
+        
+        <!-- Product Image Section -->
+        <div class="product-image-section">
+          <div class="product-image-container">
+            <% if (product.productImageUrl || product.productImage) { %>
+              <img src="/<%= product.productImageUrl || product.productImage %>" 
+                   alt="<%= product.productName %>" 
+                   class="product-image"
+                   onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%239AAEBF\' stroke-width=\'1\'%3E%3Crect x=\'2\' y=\'2\' width=\'20\' height=\'20\' rx=\'2.18\'/%3E%3Ccircle cx=\'8.5\' cy=\'8.5\' r=\'2.5\'/%3E%3Cpath d=\'M21 15l-5-4-3 3-4-4-5 5\'/%3E%3C/svg%3E';">
+              <div class="image-label">Product Image</div>
+            <% } else { %>
+              <div class="no-image">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#9AAEBF" stroke-width="1.5">
+                  <rect x="2" y="2" width="20" height="20" rx="2.18"/>
+                  <circle cx="8.5" cy="8.5" r="2.5"/>
+                  <path d="M21 15l-5-4-3 3-4-4-5 5"/>
+                </svg>
+                <p>No image available</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="info-grid">
+          <!-- Product Name -->
+          <div class="info-item">
+            <div class="info-label">Product Name</div>
+            <div class="info-value"><%= product.productName %></div>
+          </div>
+
+
+          <!-- Product Quantity -->
+          <div class="info-item">
+            <div class="info-label">Stock Quantity</div>
+            <div class="info-value info-value-large">
+              <%= product.productQuantity %> units
+              <% if (product.productQuantity <= 5 && product.productQuantity > 0) { %>
+                <span class="badge badge-low">Low stock</span>
+              <% } else if (product.productQuantity === 0) { %>
+                <span class="badge badge-out">Out of stock</span>
+              <% } else { %>
+                <span class="badge badge-active">In stock</span>
+              <% } %>
+            </div>
+          </div>
+
+          <!-- Product Quality -->
+          <div class="info-item">
+            <div class="info-label">Quality Rating</div>
+            <div class="info-value">
+              <span class="stars">
+                <% const rating = product.productQuality || 0; %>
+                <% for(let i = 1; i <= 5; i++) { %>
+                  <%= i <= Math.floor(rating) ? '★' : (i <= rating ? '½' : '☆') %>
+                <% } %>
+              </span>
+              <span class="rating-number">(<%= rating.toFixed(1) %> / 5.0)</span>
+            </div>
+          </div>
+
+          <!-- Price -->
+          <div class="info-item">
+            <div class="info-label">Price (USD)</div>
+            <div class="info-value info-value-large">
+              <% if (product.productPrice || product.price) { %>
+                $<%= (product.productPrice || product.price).toFixed(2) %>
+              <% } else { %>
+                <span style="color:#8F9EAD;">Not set</span>
+              <% } %>
+            </div>
+          </div>        
+
+        <!-- Product Description -->
+        <% if (product.productDetails || product.description) { %>
+          <div class="description-section">
+            <h3>📝 Product Details / Description</h3>
+            <div class="description-text"><%= product.productDetails || product.description %></div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Reviews Section -->
+    <div class="product-card">
+      <div class="card-header">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          Customer Reviews
+        </h2>
+      </div>
+      <div class="card-body">
+        <div class="reviews-section">
+          <div class="reviews-header">
+            <h3>All Reviews</h3>
+            <span class="review-count"><%= product.productReview ? product.productReview.length : 0 %> reviews</span>
+          </div>
+
+          <% if (product.productReview && product.productReview.length > 0) { %>
+            <% product.productReview.forEach((review, index) => { %>
+              <div class="review-card">
+                <div class="review-header">
+                  <span class="review-user">
+                    👤 <%= review.user ? (review.user.name || review.user.email || 'User') : 'Anonymous User' %>
+                  </span>
+                  <span class="review-date">
+                    <%= review.date ? new Date(review.date).toLocaleDateString() : 'Date not available' %>
+                  </span>
+                </div>
+                <div class="review-stars">
+                  <span class="stars">
+                    <% for(let i = 1; i <= 5; i++) { %>
+                      <%= i <= Math.floor(review.rating) ? '★' : (i <= review.rating ? '½' : '☆') %>
+                    <% } %>
+                  </span>
+                  <span style="font-size:12px; color:#6B7A8A;">(<%= review.rating.toFixed(1) %>)</span>
+                </div>
+                <% if (review.comment) { %>
+                  <div class="review-comment">
+                    " <%= review.comment %> "
+                  </div>
+                <% } %>
+              </div>
+            <% }) %>
+          <% } else { %>
+            <div class="no-reviews">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9AAEBF" stroke-width="1.5">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
+              <p style="margin-top: 12px;">No reviews yet for this product.</p>
+              <p style="font-size: 12px;">Reviews will appear here once customers submit them.</p>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Meta Information -->
+        <div class="meta-info">
+          <span>🆔 Product ID: <%= product._id %></span>
+          <% if (product.productReview && product.productReview.length > 0) { %>
+            <span>⭐ Average Rating: 
+              <%= (product.productReview.reduce((sum, r) => sum + (r.rating || 0), 0) / product.productReview.length).toFixed(1) %> / 5.0
+            </span>
+          <% } %>
+          <% if (product.productImageUrl || product.productImage) { %>
+            <span>🖼️ Image URL: <%= product.productImageUrl || product.productImage %></span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

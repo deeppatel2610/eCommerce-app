@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Product Management</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      background: #F8F8F6;
+      min-height: 100vh;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #E5E5E3;
+      padding: 0 24px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; }
+    .nav-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      background: #E6F1FB; display: grid; place-items: center;
+    }
+    .nav-title { font-size: 15px; font-weight: 500; color: #111; }
+
+    .logout-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: #A32D2D;
+      background: #FCEBEB; border: 1px solid #F09595;
+      border-radius: 8px; padding: 6px 12px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .logout-btn:hover { background: #F7C1C1; }
+
+    /* ── Page container ── */
+    .container { padding: 28px 24px; max-width: 1400px; margin: 0 auto; }
+
+    .top-row {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .page-title { 
+      font-size: 20px; font-weight: 600; color: #1E2A3A; 
+    }
+
+    .add-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 500; color: #0C447C;
+      background: #E6F1FB; border: 1px solid #B5D4F4;
+      border-radius: 8px; padding: 8px 14px;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .add-btn:hover { background: #D0E4F5; transform: translateY(-1px); }
+
+    /* Error flash */
+    .error-flash {
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FCEBEB;
+      border-left: 4px solid #C62828;
+      color: #B71C1C;
+    }
+
+    /* Table card */
+    .card {
+      background: #fff;
+      border: 1px solid #E5E5E3;
+      border-radius: 16px;
+      overflow-x: auto;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    table { width: 100%; border-collapse: collapse; min-width: 800px; }
+
+    thead tr { background: #FCFCFA; border-bottom: 1px solid #E5E5E3; }
+    th {
+      padding: 14px 16px;
+      font-size: 12px; font-weight: 600; color: #5A6B7A;
+      text-align: left;
+      text-transform: uppercase;
+    }
+    td {
+      padding: 14px 16px;
+      font-size: 14px; color: #1F2A3E;
+      border-bottom: 1px solid #F0F0EE;
+      vertical-align: middle;
+    }
+    tbody tr:hover { background: #FAFAF8; }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-active { background: #E6F7E6; color: #2E7D32; }
+    .badge-low { background: #FFF3E0; color: #E65100; }
+    .badge-out { background: #FCEBEB; color: #C62828; }
+
+    .action-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 500;
+      border-radius: 6px; padding: 5px 10px;
+      text-decoration: none;
+      transition: all 0.2s;
+      border: 1px solid;
+    }
+    .view-btn { color: #2C6E9E; background: #EFF6FC; border-color: #C9E0F2; }
+    .edit-btn { color: #B45F1B; background: #FEF5E7; border-color: #F3DEB5; }
+    .delete-btn { color: #A32D2D; background: #FCEBEB; border-color: #F09595; }
+    .action-btn:hover { transform: translateY(-1px); }
+
+    .empty-row td { padding: 48px; text-align: center; color: #9AAEBF; }
+
+    /* Review stars */
+    .stars {
+      color: #FFB300;
+      letter-spacing: 2px;
+    }
+    .review-preview {
+      font-size: 12px;
+      color: #6B7A8A;
+      max-width: 200px;
+    }
+
+    @media (max-width: 768px) {
+      .container { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </div>
+      <span class="nav-title">Admin dashboard</span>
+    </div>
+    <a href="/auth/logout" class="logout-btn">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A32D2D" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Logout
+    </a>
+  </nav>
+
+  <!-- Content -->
+  <div class="container">
+    <div class="top-row">
+      <span class="page-title">📦 Product Management</span>
+      <a href="/admin/add-product/<%= categoryId %> " class="add-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Product
+      </a>
+    </div>
+
+    <!-- Only error messages -->
+    <% if (locals.error && error) { %>
+      <div class="error-flash">
+        <span>⚠️</span> <%= error %>
+      </div>
+    <% } %>
+
+    <div class="card">
+       <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Quality (Rating)</th>
+            <th>Category</th>
+            <th>Reviews</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (products && products.length > 0) { %>
+            <% products.forEach((product, index) => { %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td><strong><%= product.productName %></strong></td>
+                <td>
+                  <%= product.productQuantity %>
+                  <% if (product.productQuantity <= 5 && product.productQuantity > 0) { %>
+                    <span class="badge badge-low">Low stock</span>
+                  <% } else if (product.productQuantity === 0) { %>
+                    <span class="badge badge-out">Out of stock</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="stars">
+                    <% const rating = product.productQuality || 0; %>
+                    <% for(let i = 1; i <= 5; i++) { %>
+                      <%= i <= Math.floor(rating) ? '★' : (i <= rating ? '½' : '☆') %>
+                    <% } %>
+                  </div>
+                  <span style="font-size:12px; color:#6B7A8A;">(<%= rating.toFixed(1) %>)</span>
+                </td>
+                <td>
+                  <% if (category && typeof category === 'object') { %>
+                    <span class="badge" style="background:#E6F1FB; color:#185FA5;"><%= category.categoriesName%></span>
+                  <% } else { %>
+                    <span class="badge" style="background:#E6F1FB; color:#185FA5;"><%= category.categoriesName %></span>
+                  <% } %>
+                </td>
+                <td>
+                  <% if (product.productReview && product.productReview.length > 0) { %>
+                    <div class="review-preview">
+                      📝 <%= product.productReview.length %> review(s)
+                      <br>
+                      ⭐ Avg: <%= (product.productReview.reduce((sum, r) => sum + (r.rating || 0), 0) / product.productReview.length).toFixed(1) %>
+                    </div>
+                  <% } else { %>
+                    <span style="color:#9AAEBF;">No reviews</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div class="action-group">
+                    <a href="/admin/view-product/<%= product._id %>" class="action-btn view-btn">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      View
+                    </a>
+                    <a href="/admin/edit-product/<%= product._id %>" class="action-btn edit-btn">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 3l4 4-7 7H10v-4l7-7z"/>
+                      </svg>
+                      Edit
+                    </a>
+                    <a href="/admin/delete-product/<%= product._id %>" class="action-btn delete-btn" 
+                       onclick="return confirm('Delete this product permanently?')">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14H6L5 6"/>
+                        <path d="M10 11v6"/><path d="M14 11v6"/>
+                      </svg>
+                      Delete
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr class="empty-row">
+              <td colspan="7">📭 No products found. Click "Add Product" to create one.</td>
+            </tr>
+          <% } %>
+        </tbody>
+       </table>
+    </div>
+  </div>
+</body>
+</html>

@@ -13,10 +13,13 @@ exports.registration = async (req, res) => {
 
     await user.save();
     res.status(201).json({
-      message: "User creact success!",
+      success: true,
+      message: "User created successfully!",
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: "Registration failed",
       error: error.message,
     });
   }
@@ -31,23 +34,30 @@ exports.login = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({
-        error: "User Not Found!!",
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
     }
 
     const hashPassword = user.hashPassword;
-    const isMech = await bcrypt.compare(password, hashPassword);
+    const isPasswordCorrect = await bcrypt.compare(password, hashPassword);
 
-    if (!isMech) {
-      return res.status(400).json({
-        error: "password is Wrong!!",
+    if (!isPasswordCorrect) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid password",
       });
     }
 
-    return res.status(200).json(await getToken(user));
+    return res.status(200).json({
+      success: true,
+      ...(await getToken(user)),
+    });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: "Login failed",
       error: error.message,
     });
   }
@@ -60,22 +70,29 @@ exports.newToken = async (req, res) => {
     const decodeToken = await jwt.verify(refreshToken, JWT_KEY);
 
     if (!decodeToken.id) {
-      return res.status(400).json({
-        error: "Refresh Token expires!!",
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token expired",
       });
     }
 
     const user = await UserModel.findById(decodeToken.id);
 
     if (!user) {
-      return res.status(400).json({
-        error: "user not found!",
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
       });
     }
 
-    return res.status(200).json(await getToken(user));
+    return res.status(200).json({
+      success: true,
+      ...(await getToken(user)),
+    });
   } catch (error) {
-    return res.status(500).json({
+    return res.status(401).json({
+      success: false,
+      message: "Token refresh failed",
       error: error.message,
     });
   }

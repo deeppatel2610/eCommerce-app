@@ -23,6 +23,7 @@ const addressRoutes = require("./routes/user routes/addressRoutes");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerFile = require("./swagger-output.json");
+const errorHandler = require("./middleware/errorHandler");
 /// ===============
 
 /// app use & set
@@ -97,14 +98,19 @@ app.use("/order", orderRoutes);
 app.use("/address", addressRoutes);
 /// ===============
 
-/// mongo and surver
+/// Global Error Handler
+/// ===============
+app.use(errorHandler);
+/// ===============
+
+/// mongo and server
 /// ===============
 mongoose
   .connect(envVariables.MONGO_URI)
   .then(() => {
     console.log("DB connected");
     app.listen(envVariables.PORT, "0.0.0.0", () => {
-      console.log("server have stated:- http://localhost:3000/index");
+      console.log("server has started:- http://localhost:3000/index");
     });
   })
   .catch((err) => console.log(err));

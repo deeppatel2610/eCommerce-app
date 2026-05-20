@@ -179,7 +179,7 @@
   <div class="container">
     <div class="top-row">
       <span class="page-title">📦 Product Management</span>
-      <a href="/admin/add-product/<%= categoryId %> " class="add-btn">
+      <a href="/admin/add-product/<%= categoryId %>" class="add-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#185FA5" stroke-width="2">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
@@ -262,8 +262,7 @@
                       </svg>
                       Edit
                     </a>
-                    <a href="/admin/delete-product/<%= product._id %>" class="action-btn delete-btn" 
-                       onclick="return confirm('Delete this product permanently?')">
+                    <a href="/admin/delete-product/<%= product._id %>" class="action-btn delete-btn" id="delete-btn-<%= product._id %>">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"/>
                         <path d="M19 6l-1 14H6L5 6"/>
@@ -271,6 +270,13 @@
                       </svg>
                       Delete
                     </a>
+                    <script>
+                      document.getElementById('delete-btn-<%= product._id %>').addEventListener('click', function(e) {
+                        if (!confirm('Delete this product permanently?')) {
+                          e.preventDefault();
+                        }
+                      });
+                    </script>
                   </div>
                 </td>
               </tr>

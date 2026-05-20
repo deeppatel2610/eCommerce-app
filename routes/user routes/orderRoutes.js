@@ -46,7 +46,7 @@ router.post(
   orderController.addOrder,
 );
 
-router.get("/getOrderHistories", auth, orderController.getOrderHistroys);
+router.get("/getOrderHistories", auth, orderController.getOrderHistory);
 
 router.get("/getOrderBill/:OrderId", auth, orderController.getOrderBill);
 

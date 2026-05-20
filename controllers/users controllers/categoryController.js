@@ -4,6 +4,7 @@ exports.getAllcategory = async (req, res) => {
   try {
     const caregory = await CategoriesModel.find();
     res.status(200).json({
+      success: true,
       data: caregory.map((e) => {
         return {
           id: e._id,
@@ -14,6 +15,8 @@ exports.getAllcategory = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: "Failed to fetch categories",
       error: error.message,
     });
   }
@@ -24,12 +27,17 @@ exports.getCategoryById = async (req, res) => {
   try {
     const caregory = await CategoriesModel.findById(categoryId);
     res.status(200).json({
-      id: caregory._id,
-      categoriesName: caregory.categoriesName,
-      status: caregory.status,
+      success: true,
+      data: {
+        id: caregory._id,
+        categoriesName: caregory.categoriesName,
+        status: caregory.status,
+      },
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: "Failed to fetch category",
       error: error.message,
     });
   }

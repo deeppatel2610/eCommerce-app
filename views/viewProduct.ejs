@@ -363,8 +363,7 @@
           </svg>
           Edit Product
         </a>
-        <a href="/admin/delete-product/<%= product._id %>" class="delete-btn" 
-           onclick="return confirm('Delete this product permanently?')">
+        <a href="/admin/delete-product/<%= product._id %>" class="delete-btn" id="delete-product-btn">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <polyline points="3 6 5 6 21 6"/>
             <path d="M19 6l-1 14H6L5 6"/>
@@ -372,6 +371,13 @@
           </svg>
           Delete Product
         </a>
+        <script>
+          document.getElementById('delete-product-btn').addEventListener('click', function(e) {
+            if (!confirm('Delete this product permanently?')) {
+              e.preventDefault();
+            }
+          });
+        </script>
       </div>
     </div>
 

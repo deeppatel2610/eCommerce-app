@@ -1,21 +1,27 @@
-exports.requiredFieldForProductRivew = (req, res, next) => {
+exports.requiredFieldForProductReview = (req, res, next) => {
   const { productId } = req.params;
   const { userId, rating } = req.body;
 
   if (!Number.isFinite(rating)) {
     return res.status(400).json({
-      error: "rating use only number!!",
+      success: false,
+      message: "Rating must be a number",
     });
   }
   if (!productId) {
     return res.status(400).json({
-      error: "ProductId required in path For Review!!",
+      success: false,
+      message: "Product ID is required",
     });
   } else if (!rating) {
     return res.status(400).json({
-      error: "rating is required Field For Review!!",
+      success: false,
+      message: "Rating is required",
     });
   } else {
     next();
   }
 };
+
+// Keep old export for backward compatibility
+exports.requiredFieldForProductRivew = exports.requiredFieldForProductReview;

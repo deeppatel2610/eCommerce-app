@@ -3,19 +3,23 @@ exports.requiredFieldForAddOrder = (req, res, next) => {
 
   if (!cartId) {
     return res.status(400).json({
-      error: "cartId Required!",
+      success: false,
+      message: "Cart ID is required",
     });
   } else if (!addressId) {
     return res.status(400).json({
-      error: "addressId Required!",
+      success: false,
+      message: "Address ID is required",
     });
   } else if (!paymentMethod) {
     return res.status(400).json({
-      error: "paymentMethod is not found!",
+      success: false,
+      message: "Payment method is required",
     });
   } else if (!paymentStatus) {
     return res.status(400).json({
-      error: "paymentStatus is not found!",
+      success: false,
+      message: "Payment status is required",
     });
   } else if (
     !["COD", "UPI", "CARD", "PAYPAL", "NET_BANKING", "WALLET"].includes(
@@ -23,7 +27,8 @@ exports.requiredFieldForAddOrder = (req, res, next) => {
     )
   ) {
     return res.status(400).json({
-      error: "paymentMethod is Invalid!",
+      success: false,
+      message: "Invalid payment method",
     });
   } else if (
     !["PENDING", "SUCCESS", "FAILED", "REFUNDED"].includes(
@@ -31,7 +36,8 @@ exports.requiredFieldForAddOrder = (req, res, next) => {
     )
   ) {
     return res.status(400).json({
-      error: "paymentStatus is Invalid!",
+      success: false,
+      message: "Invalid payment status",
     });
   } else {
     next();

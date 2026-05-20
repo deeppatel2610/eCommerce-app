@@ -12,12 +12,15 @@ exports.addProductReview = async (req, res) => {
       { $set: { rating, comment } },
       { new: true, upsert: true },
     ).then(() => {
-      res.status(200).json({
-        message: "Product Review success!",
+      res.status(201).json({
+        success: true,
+        message: "Product review added successfully",
       });
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: "Failed to add product review",
       error: error.message,
     });
   }
@@ -119,15 +122,20 @@ exports.getProductReviewByProductId = async (req, res) => {
     ]);
     if (reviews[0] === undefined) {
       res.status(200).json({
-        message: "data not found!",
+        success: true,
+        message: "No reviews found",
+        data: [],
       });
     } else {
       res.status(200).json({
+        success: true,
         data: reviews[0],
       });
     }
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: "Failed to fetch product reviews",
       error: error.message,
     });
   }
@@ -199,7 +207,7 @@ exports.getProductReviewByProductIdAndUserId = async (req, res) => {
           },
           reviews: {
             $first: {
-              reting: "$rating",
+              rating: "$rating",
               comment: "$comment",
             },
           },
@@ -208,9 +216,16 @@ exports.getProductReviewByProductIdAndUserId = async (req, res) => {
     ]);
 
     res.status(200).json({
+      success: true,
       data: reviews[0],
     });
-  } catch (error) {}
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch review details",
+      error: error.message,
+    });
+  }
 };
 
 exports.getProductReviewByUserId = async (req, res) => {
@@ -265,7 +280,7 @@ exports.getProductReviewByUserId = async (req, res) => {
           reviews: {
             $push: {
               createdAt: "$createdAt",
-              reting: "$rating",
+              rating: "$rating",
               comment: "$comment",
               product: {
                 productName: "$product.productName",
@@ -283,10 +298,13 @@ exports.getProductReviewByUserId = async (req, res) => {
       },
     ]);
     res.status(200).json({
+      success: true,
       data: reviews[0],
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: "Failed to fetch user reviews",
       error: error.message,
     });
   }

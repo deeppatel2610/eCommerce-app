@@ -3,11 +3,14 @@ const swaggerAutogen = require("swagger-autogen")();
 
 const doc = {
   info: {
-    title: "My API",
-    description: "Simple API docs",
+    title: "eCommerce API",
+    description: "eCommerce Application API Documentation",
+    version: "1.0.0",
   },
   host: "localhost:3000",
-  schemes: ["http"],
+  schemes: ["http", "https"],
+  consumes: ["application/json"],
+  produces: ["application/json"],
 };
 
 const outputFile = "./swagger-output.json";

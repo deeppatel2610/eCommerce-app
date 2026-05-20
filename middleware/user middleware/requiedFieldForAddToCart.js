@@ -3,15 +3,13 @@ exports.requiredFieldForAddToCart = (req, res, next) => {
 
   if (!Number.isFinite(quantity)) {
     return res.status(400).json({
-      error: "quantity use only number!!",
+      success: false,
+      message: "Quantity must be a number",
     });
   } else if (!productId || quantity < 1) {
     return res.status(400).json({
-      message: "Invalid product or quantity",
-    });
-  } else if (!productId) {
-    return res.status(400).json({
-      error: "ProductId required in path For Add To Cart!!",
+      success: false,
+      message: "Invalid product ID or quantity",
     });
   } else {
     next();

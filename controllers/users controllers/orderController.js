@@ -10,7 +10,10 @@ exports.addToCart = async (req, res) => {
 
     const product = await ProductModel.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
     }
 
     let cart = await CartModel.findOne({ userId });
@@ -39,10 +42,13 @@ exports.addToCart = async (req, res) => {
     await cart.save();
 
     return res.status(201).json({
-      message: "Product added to cart",
+      success: true,
+      message: "Product added to cart successfully",
     });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: "Failed to add product to cart",
       error: error.message,
     });
   }
@@ -57,13 +63,15 @@ exports.removeOneProduct = async (req, res) => {
 
     if (!cart) {
       return res.status(404).json({
-        error: "cart list not found!!",
+        success: false,
+        message: "Cart not found",
       });
     }
 
     if (cart.items.length === 0) {
       return res.status(404).json({
-        error: "product not found!",
+        success: false,
+        message: "Product not found in cart",
       });
     }
     cart.items = cart.items.filter(
@@ -72,12 +80,15 @@ exports.removeOneProduct = async (req, res) => {
 
     await cart.save();
     return res.status(200).json({
-      message: "Product Remove Success!",
+      success: true,
+      message: "Product removed successfully",
       cart,
     });
   } catch (error) {
     return res.status(500).json({
-      message: error.message,
+      success: false,
+      message: "Failed to remove product",
+      error: error.message,
     });
   }
 };
@@ -88,10 +99,13 @@ exports.removeAllProduct = async (req, res) => {
   try {
     let cart = await CartModel.findOneAndDelete({ userId });
     return res.status(200).json({
-      message: "remove all product!!",
+      success: true,
+      message: "All products removed successfully",
     });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: "Failed to remove all products",
       error: error.message,
     });
   }
@@ -212,6 +226,8 @@ exports.getCartList = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
+      success: false,
+      message: "Failed to fetch cart list",
       error: error.message,
     });
   }
@@ -261,11 +277,14 @@ exports.updateQuantity = async (req, res) => {
     await cart.save();
 
     return res.status(200).json({
-      message: "Quantity updated successfully.",
+      success: true,
+      message: "Quantity updated successfully",
       data: cart,
     });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: "Failed to update quantity",
       error: error.message,
     });
   }
@@ -286,27 +305,35 @@ exports.addOrder = async (req, res) => {
     });
 
     await Order.save().then(() => {
-      return res.status(200).json({
-        message: "Order have add!!",
+      return res.status(201).json({
+        success: true,
+        message: "Order created successfully",
       });
     });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: "Failed to create order",
       error: error.message,
     });
   }
 };
 
-exports.getOrderHistroys = async (req, res) => {
+exports.getOrderHistory = async (req, res) => {
   const userId = req.user.id;
   try {
     const Orders = await OrderModel.find({ userId });
 
-    if (!Orders) {
-      return res.status(200).json({ message: "Order not available!!" });
+    if (!Orders || Orders.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No orders found",
+        data: [],
+      });
     }
 
     res.status(200).json({
+      success: true,
       data: Orders.map((e) => {
         return {
           OrderId: e._id,
@@ -316,6 +343,8 @@ exports.getOrderHistroys = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: "Failed to fetch order history",
       error: error.message,
     });
   }
@@ -455,6 +484,8 @@ exports.getOrderBill = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
+      success: false,
+      message: "Failed to fetch order bill",
       error: error.message,
     });
   }

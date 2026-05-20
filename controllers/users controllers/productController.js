@@ -38,6 +38,7 @@ exports.getAllProduct = async (req, res) => {
     }
 
     res.status(200).json({
+      success: true,
       page,
       limit,
       data: product.map((e) => {
@@ -53,7 +54,9 @@ exports.getAllProduct = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      errer: error.message,
+      success: false,
+      message: "Failed to fetch products",
+      error: error.message,
     });
   }
 };
@@ -65,6 +68,7 @@ exports.getProductDetail = async (req, res) => {
     const product = await ProductModel.findById(productId);
 
     res.status(200).json({
+      success: true,
       data: {
         id: product._id,
         productName: product.productName,
@@ -79,7 +83,9 @@ exports.getProductDetail = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      errer: error.message,
+      success: false,
+      message: "Failed to fetch product detail",
+      error: error.message,
     });
   }
 };
@@ -96,6 +102,7 @@ exports.getRandomProduct = async (req, res) => {
       { $sample: { size: productLimit } },
     ]);
     res.status(200).json({
+      success: true,
       page: 0,
       limit,
       data: product.map((e) => {
@@ -111,7 +118,9 @@ exports.getRandomProduct = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      errer: error.message,
+      success: false,
+      message: "Failed to fetch random products",
+      error: error.message,
     });
   }
 };
